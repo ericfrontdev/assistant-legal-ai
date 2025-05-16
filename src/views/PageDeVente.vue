@@ -1,11 +1,41 @@
 <template>
-  <div>
-    <h1>AssistantLegal AI</h1>
-    <p>Votre assistant juridique intelligent, actif 24/7.</p>
-    <!-- simulateur, plans, CTA -->
+  <div :style="cssVars">
+    <div v-if="loading">Chargement...</div>
+    <div v-else-if="errorMessage" class="text-red-600">Erreur : {{ errorMessage }}</div>
+    <ChatWindow
+      v-else-if="cabinet"
+      :prompt="cabinet.prompt"
+      :cabinet-name="cabinet.nom"
+      :style-json="cabinet.style_json"
+    />
   </div>
 </template>
 
 <script setup>
-// simulateur et CTA à venir ici
+import { useRoute } from 'vue-router'
+import { useCabinetData } from '@/composables/useCabinetData'
+import ChatWindow from '@/components/ChatWindow.vue'
+import { computed } from 'vue'
+
+const route = useRoute()
+const { cabinet, loading, errorMessage } = useCabinetData(route.params.slug)
+
+const cssVars = computed(() => {
+  const s = cabinet.value?.style_json || {}
+  return {
+    '--primary': s.primaryColor || '#1d1d1d',
+    '--secondary': s.secondaryColor || '#c72626',
+    '--bg': s.backgroundColor || '#ffffff',
+    '--text': s.textColor || '#222222',
+    '--font': s.fontFamily || 'sans-serif',
+    '--radius': s.borderRadius || '8px',
+    '--btn-bg': s.buttonStyle?.background || s.primaryColor || '#1d1d1d',
+    '--btn-text': s.buttonStyle?.textColor || '#ffffff',
+    '--btn-hover': s.buttonStyle?.hoverBackground || '#000000',
+    '--btn-radius': s.buttonStyle?.borderRadius || '8px',
+    fontFamily: s.fontFamily || 'sans-serif',
+    backgroundColor: s.backgroundColor || '#ffffff',
+    color: s.textColor || '#222222',
+  }
+})
 </script>
